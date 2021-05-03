@@ -4,33 +4,36 @@
 		<title>Bed Bath and Beyond</title>
 		<style>
 			body{
-			background:-webkit-gradient(linear,left top,left bottom,from(#fff),to(#333)) fixed;
-			height:100%;
+				background:-webkit-gradient(linear,left top,left bottom,from(#0A0F45),to(#1F2EE0)) fixed;
+				color:#fff;
+				height:100%;
 			}
 			.btn{
-			width:100px;
-			height:50px;
+				height:30px;
+				width:135px;
 			}
 			.center{
-			display:table;
-			text-align:center;
-			margin-left:auto;
-			margin-right:auto;
+				display:table;
+				margin-left:auto;
+				margin-right:auto;
+				text-align:center;
 			}
 			.fullcenter{
-			position:absolute;
-			top:50%;
-			left:50%;
-			transform:translateX(-50%) translateY(-50%);
+				left:50%;
+				position:absolute;
+				top:50%;
+				transform:translateX(-50%) translateY(-50%);
 			}
 		</style>
 	</head>
 	<body>
 		<div class='center' style='margin-top:100px;'>
 			<button id='clear' type='button' onclick='javascript:clearCanvas()' class='btn' title='Clear coupon'><b>Clear</b></button>
-			Coupon Style: <input id='couponStyle' type='number' min='1' max='2' style='width:40px;' value='2'>
-			<button id='generate' type='button' onclick='javascript:generate()' class='btn' title='Generate a unique coupon'><b>Generate</b></button>
-			<br>
+			<hr>
+			Coupon style: <input id='couponStyle' type='number' min='1' max='2' style='width:40px;' value='2'>
+			<hr>
+			<button id='generate' type='button' onclick='generate()' class='btn' title='Generate a unique coupon'><b>Regenerate</b></button>
+			<hr>
 			<br>
 			<canvas id='draw' width='800' height='316' style='border:1px solid #3B3C40' hidden></canvas>
 			<img class='center' id='img' width='800' height='316' style='border:1px solid #3B3C40'></img>
@@ -46,6 +49,8 @@
 				oy = 0;
 			var map = ['11011001100', '11001101100', '11001100110', '10010011000', '10010001100', '10001001100', '10011001000', '10011000100', '10001100100', '11001001000', '11001000100', '11000100100', '10110011100', '10011011100', '10011001110', '10111001100', '10011101100', '10011100110', '11001110010', '11001011100', '11001001110', '11011100100', '11001110100', '11101101110', '11101001100', '11100101100', '11100100110', '11101100100', '11100110100', '11100110010', '11011011000', '11011000110', '11000110110', '10100011000', '10001011000', '10001000110', '10110001000', '10001101000', '10001100010', '11010001000', '11000101000', '11000100010', '10110111000', '10110001110', '10001101110', '10111011000', '10111000110', '10001110110', '11101110110', '11010001110', '11000101110', '11011101000', '11011100010', '11011101110', '11101011000', '11101000110', '11100010110', '11101101000', '11101100010', '11100011010', '11101111010', '11001000010', '11110001010', '10100110000', '10100001100', '10010110000', '10010000110', '10000101100', '10000100110', '10110010000', '10110000100', '10011010000', '10011000010', '10000110100', '10000110010', '11000010010', '11001010000', '11110111010', '11000010100', '10001111010', '10100111100', '10010111100', '10010011110', '10111100100', '10011110100', '10011110010', '11110100100', '11110010100', '11110010010', '11011011110', '11011110110', '11110110110', '10101111000', '10100011110', '10001011110', '10111101000', '10111100010', '11110101000', '11110100010', '10111011110', '10111101110', '11101011110', '11110101110', '11010000100', '11010010000', '11010011100', '11000111010', '11010111000', '1100011101011'];
 			clearCanvas();
+
+			setTimeout(generate, 300);
 
 			function clearCanvas() {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -77,15 +82,17 @@
 			}
 
 			function genBarcode(step, x, y, h, fonty, font, ex, ey) {
-				code = genCode();
-				codeStr = genCodeString();
-				for (var i = 0, len = codeStr.length; i < len; i++)
+				var date = randomDate();
+				var code = genCode(date);
+				var codeStr = genCodeString();
+				for (var i = 0, len = codeStr.length; i < len; i++) {
 					if (codeStr.charAt(i) != '0') drawBar(step, x, y, h, i);
+				}
 				if (ex != 0 && ey != 0) { //expiration date
 					ctx.textBaseline = 'bottom';
 					ctx.textAlign = 'left';
 					ctx.font = 'Bold 16px Trebuchet MS'
-					ctx.fillText(formatDate() + '.', ex + ox, ey + 4 + oy);
+					ctx.fillText(formatDate(date) + '.', ex + ox, ey + 4 + oy);
 				}
 				ctx.textBaseline = 'top';
 				ctx.textAlign = 'center';
@@ -106,14 +113,28 @@
 				ctx.fillRect(x1 + ox, y1 + oy, x2 - x1, y2 - y1);
 			}
 
-			function genCode() {
-				var c = '5117135000000001';
-				for (var i = 0; i < 4; i++) c += Math.floor(Math.random() * 10).toString();
+			function genCode(date) {
+				var c = '129713500000000' + encodeDate(date); //'511713500000000';
+				//for (var i = 0; i < 4; i++) c += Math.floor(Math.random() * 10).toString();
+				console.log('Code: ', c);
 				return c;
 			}
 
 			function l() {
 				return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' [Math.floor(Math.random() * 36)];
+			}
+
+			function encodeDate(date) {
+				var start = new Date(date.getFullYear(), 0, 0);
+				var diff = date - start;
+				var oneDay = 1000 * 60 * 60 * 24;
+
+				var day = Math.floor(diff / oneDay);
+				var yy = date.getFullYear() - 2000;
+				var output = ('00' + yy).substring(yy.toString().length) + ('000' + day).substring(day.toString().length);
+				console.log('Expiration date:', date.toDateString());
+				console.log('Encoded expiration date:', output);
+				return output;
 			}
 
 			function genCodeString() {
@@ -130,7 +151,7 @@
 			}
 
 			function randomDate() {
-				var startDate = new Date(2012, 0, 1).getTime();
+				var startDate = new Date(2021, 0, 1).getTime();
 				var endDate = new Date().getTime();
 				var spaces = (endDate - startDate);
 				var timestamp = Math.round(Math.random() * spaces);
@@ -138,10 +159,10 @@
 				return new Date(timestamp);
 			}
 
-			function formatDate() {
+			function formatDate(date) {
 				var minYear = 2016;
-				var month = randomDate().getMonth() + 1;
-				var day = randomDate().getDate();
+				var month = date.getMonth() + 1;
+				var day = date.getDate();
 				var year = Math.floor(minYear - 2000 + Math.random() * (new Date().getFullYear() - minYear + 1));
 				month = month < 10 ? '0' + month : month;
 				day = day < 10 ? '0' + day : day;
