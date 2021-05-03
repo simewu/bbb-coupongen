@@ -160,10 +160,10 @@
 			}
 
 			function formatDate(date) {
-				var minYear = 2016;
+				//var minYear = 2016;
 				var month = date.getMonth() + 1;
 				var day = date.getDate();
-				var year = Math.floor(minYear - 2000 + Math.random() * (new Date().getFullYear() - minYear + 1));
+				var year = new Date().getFullYear() - 2000; //Math.floor(minYear - 2000 + Math.random() * (new Date().getFullYear() - minYear + 1));
 				month = month < 10 ? '0' + month : month;
 				day = day < 10 ? '0' + day : day;
 				year = year < 10 ? '0' + year : year;
@@ -172,7 +172,7 @@
 
 			function splice(str, start, delCount, newSubStr) {
 				return str.slice(0, start) + newSubStr + str.slice(start + Math.abs(delCount));
-			};
+			}
 		</script>
 	</body>
 </html>
