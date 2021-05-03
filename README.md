@@ -28,3 +28,4 @@ BBB coupons are in the following format: `AAA BBBBB CCCCCCC YYDDD`.
 - **YY** : Two-digit year (18 : 2018)
 - **DDD** : Day of the year (between 1 and 365)
 
+Barcodes are generated in Code 128.

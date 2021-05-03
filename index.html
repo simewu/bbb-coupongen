@@ -1,150 +1,157 @@
 <html>
-<head>
-<meta charset="utf-8"/>
-<title>Bed Bath and Beyond</title>
-<style>
-	body{
-		background:-webkit-gradient(linear,left top,left bottom,from(#fff),to(#333)) fixed;
-		height:100%;
-	}
-	.btn{
-		width:100px;
-		height:50px;
-	}
-	.center{
-		display:table;
-		text-align:center;
-		margin-left:auto;
-		margin-right:auto;
-	}
-	.fullcenter{
-		position:absolute;
-		top:50%;
-		left:50%;
-		transform:translateX(-50%) translateY(-50%);
-	}
-</style>
-</head>
-<body>
-<div class="center" style="margin-top:100px;">
-	<button id="clear" type="button" onclick="javascript:clearCanvas()" class="btn" title="Clear coupon"><b>Clear</b></button>
-	Coupon Style: <input id="couponStyle" type="number" min="1" max="2" style="width:40px;" value="2">
-	<button id="generate" type="button" onclick="javascript:generate()" class="btn" title="Generate a unique coupon"><b>Generate</b></button>
-	<br>
-	<br>
-	<canvas id="draw" width="800" height="316" style="border:1px solid #3B3C40" hidden></canvas>
-    <img class="center" id="img" width="800" height="316" style="border:1px solid #3B3C40"></img>
-</div>
-<script>
-	var code="",codeStr="";
-	var canvas=document.getElementById("draw");
-	var ctx=canvas.getContext("2d");
-	var image=document.getElementById("img");
-	var couponStyle=document.getElementById("couponStyle");
-	var ox=0,oy=0;
-	var map=["11011001100","11001101100","11001100110","10010011000","10010001100","10001001100","10011001000","10011000100","10001100100","11001001000","11001000100","11000100100","10110011100","10011011100","10011001110","10111001100","10011101100","10011100110","11001110010","11001011100","11001001110","11011100100","11001110100","11101101110","11101001100","11100101100","11100100110","11101100100","11100110100","11100110010","11011011000","11011000110","11000110110","10100011000","10001011000","10001000110","10110001000","10001101000","10001100010","11010001000","11000101000","11000100010","10110111000","10110001110","10001101110","10111011000","10111000110","10001110110","11101110110","11010001110","11000101110","11011101000","11011100010","11011101110","11101011000","11101000110","11100010110","11101101000","11101100010","11100011010","11101111010","11001000010","11110001010","10100110000","10100001100","10010110000","10010000110","10000101100","10000100110","10110010000","10110000100","10011010000","10011000010","10000110100","10000110010","11000010010","11001010000","11110111010","11000010100","10001111010","10100111100","10010111100","10010011110","10111100100","10011110100","10011110010","11110100100","11110010100","11110010010","11011011110","11011110110","11110110110","10101111000","10100011110","10001011110","10111101000","10111100010","11110101000","11110100010","10111011110","10111101110","11101011110","11110101110","11010000100","11010010000","11010011100","11000111010","11010111000","1100011101011"];
-	clearCanvas();
-	
-	function clearCanvas(){
-		ctx.clearRect(0,0,canvas.width,canvas.height);
-		image.src=canvas.toDataURL("image/png");
-	}
-	function generate(){
-		var img=new Image();
-		img.onload=function(){
-			canvas.width=img.width;
-			canvas.height=img.height;
-			if(couponStyle.value==1){
-				image.width=img.width/2;
-				image.height=img.height/2;
-			}else{
-				image.width=img.width/1.1;
-				image.height=img.height/1.1;
+	<head>
+		<meta charset='utf-8'/>
+		<title>Bed Bath and Beyond</title>
+		<style>
+			body{
+			background:-webkit-gradient(linear,left top,left bottom,from(#fff),to(#333)) fixed;
+			height:100%;
 			}
-			
-			ox=Math.floor(Math.random()*2-1);
-			oy=Math.floor(Math.random()*2-1);
-			ctx.drawImage(img,ox,oy);
-			if(couponStyle.value==1) genBarcode(4,835,775,97,894,"32px Trebuchet MS",0,0);
-			else if(couponStyle.value==2) genBarcode(2,495,175,23,199,"Bold 12px Trebuchet MS",615,155);
-			image.src=canvas.toDataURL("image/png");
-		}
-		if(couponStyle.value==1) img.src="bbb1.jpg";
-		else if(couponStyle.value==2) img.src="bbb2.jpg";
-	}
-	
-	function genBarcode(step,x,y,h,fonty,font,ex,ey){
-		code=genCode();
-		codeStr=genCodeString();
-		for(var i=0,len=codeStr.length;i<len;i++) if(codeStr.charAt(i)!="0") drawBar(step,x,y,h,i);
-		if(ex!=0&&ey!=0){ //expiration date
-			ctx.textBaseline="bottom";
-			ctx.textAlign="left";
-			ctx.font="Bold 16px Trebuchet MS"
-			ctx.fillText(formatDate()+".",ex+ox,ey+4+oy);
-		}
-		ctx.textBaseline="top";
-		ctx.textAlign="center"; 
-		ctx.font=font
-		var code2=splice(code,8,0," ")
-		code2=splice(code2,4,0," ");
-		ctx.fillText(code2,x+codeStr.length/2*step+ox,fonty+oy);
-		ctx.textBaseline="bottom";
-		ctx.fillText("MO: VYDD-6"+l()+l()+l(),x+codeStr.length/2*step+ox,y+(y+h-fonty)+oy);
-	}
-	
-	function drawBar(step,x,y,h,i){
-		var x1=x+i*step,x2=x1+step;
-		var y1=y,y2=y+h;
-		ctx.fillStyle="#3B3C40";
-		ctx.fillRect(x1+ox,y1+oy,x2-x1,y2-y1);
-	}
-	
-	function genCode(){
-		var c="5117135000000001";
-		for(var i=0;i<4;i++) c+=Math.floor(Math.random()*10).toString();
-		return c;
-	}
-	
-	function l(){
-		return "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random()*36)];
-	}
-	
-	function genCodeString(){
-		var s=map[105],check=208;
-		for(var i=0,len=code.length;i<len;i+=2){
-			var n=parseInt(code.charAt(i)+code.charAt(i+1));
-			s+=map[n];
-			check+=n*(i/2+1);
-		}
-		s+=map[check%103];
-		s+=map[108];
-		return s;
-	}
-	
-	function randomDate(){ 
-	   var startDate=new Date(2012,0,1).getTime();
-	   var endDate=new Date().getTime();
-	   var spaces=(endDate-startDate);
-	   var timestamp=Math.round(Math.random()*spaces);
-	   timestamp+=startDate;
-	   return new Date(timestamp);
-	}
-	
-	function formatDate(){
-		var minYear=2016;
-		var month=randomDate().getMonth()+1;
-		var day=randomDate().getDate();
-		var year=Math.floor(minYear-2000+Math.random()*(new Date().getFullYear()-minYear+1));
-		month=month<10?'0'+month:month;
-		day=day<10?'0'+day:day;
-		year=year<10?'0'+year:year;
-		return String(month+"/"+day+"/"+year);
-	}
-	
-	function splice(str,start,delCount,newSubStr) {
-        return str.slice(0, start)+newSubStr+str.slice(start+Math.abs(delCount));
-    };
-</script>
-</body>
+			.btn{
+			width:100px;
+			height:50px;
+			}
+			.center{
+			display:table;
+			text-align:center;
+			margin-left:auto;
+			margin-right:auto;
+			}
+			.fullcenter{
+			position:absolute;
+			top:50%;
+			left:50%;
+			transform:translateX(-50%) translateY(-50%);
+			}
+		</style>
+	</head>
+	<body>
+		<div class='center' style='margin-top:100px;'>
+			<button id='clear' type='button' onclick='javascript:clearCanvas()' class='btn' title='Clear coupon'><b>Clear</b></button>
+			Coupon Style: <input id='couponStyle' type='number' min='1' max='2' style='width:40px;' value='2'>
+			<button id='generate' type='button' onclick='javascript:generate()' class='btn' title='Generate a unique coupon'><b>Generate</b></button>
+			<br>
+			<br>
+			<canvas id='draw' width='800' height='316' style='border:1px solid #3B3C40' hidden></canvas>
+			<img class='center' id='img' width='800' height='316' style='border:1px solid #3B3C40'></img>
+		</div>
+		<script>
+			var code = '',
+				codeStr = '';
+			var canvas = document.getElementById('draw');
+			var ctx = canvas.getContext('2d');
+			var image = document.getElementById('img');
+			var couponStyle = document.getElementById('couponStyle');
+			var ox = 0,
+				oy = 0;
+			var map = ['11011001100', '11001101100', '11001100110', '10010011000', '10010001100', '10001001100', '10011001000', '10011000100', '10001100100', '11001001000', '11001000100', '11000100100', '10110011100', '10011011100', '10011001110', '10111001100', '10011101100', '10011100110', '11001110010', '11001011100', '11001001110', '11011100100', '11001110100', '11101101110', '11101001100', '11100101100', '11100100110', '11101100100', '11100110100', '11100110010', '11011011000', '11011000110', '11000110110', '10100011000', '10001011000', '10001000110', '10110001000', '10001101000', '10001100010', '11010001000', '11000101000', '11000100010', '10110111000', '10110001110', '10001101110', '10111011000', '10111000110', '10001110110', '11101110110', '11010001110', '11000101110', '11011101000', '11011100010', '11011101110', '11101011000', '11101000110', '11100010110', '11101101000', '11101100010', '11100011010', '11101111010', '11001000010', '11110001010', '10100110000', '10100001100', '10010110000', '10010000110', '10000101100', '10000100110', '10110010000', '10110000100', '10011010000', '10011000010', '10000110100', '10000110010', '11000010010', '11001010000', '11110111010', '11000010100', '10001111010', '10100111100', '10010111100', '10010011110', '10111100100', '10011110100', '10011110010', '11110100100', '11110010100', '11110010010', '11011011110', '11011110110', '11110110110', '10101111000', '10100011110', '10001011110', '10111101000', '10111100010', '11110101000', '11110100010', '10111011110', '10111101110', '11101011110', '11110101110', '11010000100', '11010010000', '11010011100', '11000111010', '11010111000', '1100011101011'];
+			clearCanvas();
+
+			function clearCanvas() {
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				image.src = canvas.toDataURL('image/png');
+			}
+
+			function generate() {
+				var img = new Image();
+				img.onload = function() {
+					canvas.width = img.width;
+					canvas.height = img.height;
+					if (couponStyle.value == 1) {
+						image.width = img.width / 2;
+						image.height = img.height / 2;
+					} else {
+						image.width = img.width / 1.1;
+						image.height = img.height / 1.1;
+					}
+
+					ox = Math.floor(Math.random() * 2 - 1);
+					oy = Math.floor(Math.random() * 2 - 1);
+					ctx.drawImage(img, ox, oy);
+					if (couponStyle.value == 1) genBarcode(4, 835, 775, 97, 894, '32px Trebuchet MS', 0, 0);
+					else if (couponStyle.value == 2) genBarcode(2, 495, 175, 23, 199, 'Bold 12px Trebuchet MS', 615, 155);
+					image.src = canvas.toDataURL('image/png');
+				}
+				if (couponStyle.value == 1) img.src = 'img/bbb1.jpg';
+				else if (couponStyle.value == 2) img.src = 'img/bbb2.jpg';
+			}
+
+			function genBarcode(step, x, y, h, fonty, font, ex, ey) {
+				code = genCode();
+				codeStr = genCodeString();
+				for (var i = 0, len = codeStr.length; i < len; i++)
+					if (codeStr.charAt(i) != '0') drawBar(step, x, y, h, i);
+				if (ex != 0 && ey != 0) { //expiration date
+					ctx.textBaseline = 'bottom';
+					ctx.textAlign = 'left';
+					ctx.font = 'Bold 16px Trebuchet MS'
+					ctx.fillText(formatDate() + '.', ex + ox, ey + 4 + oy);
+				}
+				ctx.textBaseline = 'top';
+				ctx.textAlign = 'center';
+				ctx.font = font
+				var code2 = splice(code, 8, 0, ' ')
+				code2 = splice(code2, 4, 0, ' ');
+				ctx.fillText(code2, x + codeStr.length / 2 * step + ox, fonty + oy);
+				ctx.textBaseline = 'bottom';
+				ctx.fillText('MO: VYDD-6' + l() + l() + l(), x + codeStr.length / 2 * step + ox, y + (y + h - fonty) + oy);
+			}
+
+			function drawBar(step, x, y, h, i) {
+				var x1 = x + i * step,
+					x2 = x1 + step;
+				var y1 = y,
+					y2 = y + h;
+				ctx.fillStyle = '#3B3C40';
+				ctx.fillRect(x1 + ox, y1 + oy, x2 - x1, y2 - y1);
+			}
+
+			function genCode() {
+				var c = '5117135000000001';
+				for (var i = 0; i < 4; i++) c += Math.floor(Math.random() * 10).toString();
+				return c;
+			}
+
+			function l() {
+				return '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ' [Math.floor(Math.random() * 36)];
+			}
+
+			function genCodeString() {
+				var s = map[105],
+					check = 208;
+				for (var i = 0, len = code.length; i < len; i += 2) {
+					var n = parseInt(code.charAt(i) + code.charAt(i + 1));
+					s += map[n];
+					check += n * (i / 2 + 1);
+				}
+				s += map[check % 103];
+				s += map[108];
+				return s;
+			}
+
+			function randomDate() {
+				var startDate = new Date(2012, 0, 1).getTime();
+				var endDate = new Date().getTime();
+				var spaces = (endDate - startDate);
+				var timestamp = Math.round(Math.random() * spaces);
+				timestamp += startDate;
+				return new Date(timestamp);
+			}
+
+			function formatDate() {
+				var minYear = 2016;
+				var month = randomDate().getMonth() + 1;
+				var day = randomDate().getDate();
+				var year = Math.floor(minYear - 2000 + Math.random() * (new Date().getFullYear() - minYear + 1));
+				month = month < 10 ? '0' + month : month;
+				day = day < 10 ? '0' + day : day;
+				year = year < 10 ? '0' + year : year;
+				return String(month + '/' + day + '/' + year);
+			}
+
+			function splice(str, start, delCount, newSubStr) {
+				return str.slice(0, start) + newSubStr + str.slice(start + Math.abs(delCount));
+			};
+		</script>
+	</body>
 </html>
