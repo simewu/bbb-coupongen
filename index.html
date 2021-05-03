@@ -39,8 +39,8 @@
 			<img class='center' id='img' width='800' height='316' style='border:1px solid #3B3C40'></img>
 		</div>
 		<script>
-			var code = '',
-				codeStr = '';
+			var code = '';
+			var codeStr = '';
 			var canvas = document.getElementById('draw');
 			var ctx = canvas.getContext('2d');
 			var image = document.getElementById('img');
@@ -84,7 +84,7 @@
 			function genBarcode(step, x, y, h, fonty, font, ex, ey) {
 				var date = randomDate();
 				var code = genCode(date);
-				var codeStr = genCodeString();
+				var codeStr = genCodeString(code);
 				for (var i = 0, len = codeStr.length; i < len; i++) {
 					if (codeStr.charAt(i) != '0') drawBar(step, x, y, h, i);
 				}
@@ -137,9 +137,8 @@
 				return output;
 			}
 
-			function genCodeString() {
-				var s = map[105],
-					check = 208;
+			function genCodeString(code) {
+				var s = map[105], check = 208;
 				for (var i = 0, len = code.length; i < len; i += 2) {
 					var n = parseInt(code.charAt(i) + code.charAt(i + 1));
 					s += map[n];
@@ -147,6 +146,7 @@
 				}
 				s += map[check % 103];
 				s += map[108];
+				console.log('Encoded code:', s);
 				return s;
 			}
 
